@@ -16,6 +16,7 @@ public class DrawPanel extends JPanel implements MouseListener {
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
         int[][] grid = layout.getGrid();
         int x = 10;
         int y = 10;

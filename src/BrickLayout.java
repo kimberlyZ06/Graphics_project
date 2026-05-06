@@ -25,48 +25,36 @@ public class BrickLayout {
     public int[][] getGrid() {
         return grid;
     }
+    long startTime = System.currentTimeMillis();
 
     private int i = 0;
     public void dropOneBrick() {
-//        int maxX = 0;
 //        for (int i = 0; i < bricks.size(); i++) {
-//            int currentX = bricks.get(i).getEnd();
-//            if (currentX > maxX) {
-//                maxX = currentX;
-//            }
-//        }
-//        int maxY = bricks.size();
-
-        for (int i = 0; i < bricks.size(); i++) {
             ArrayList<Integer> counter = new ArrayList<>();
             for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
                 int count = 29;
                 for (int row = 29; row >= 0; row--) {
                     if (grid[row][col - 1] == 1) {
-//                        System.out.println("true");
                         count = row - 1;
                     }
                 }
                 counter.add(count);
             }
 
-//            System.out.println("counter: " + counter);
             int nextLayer = counter.get(0);
             for (int j = 1; j < counter.size(); j++) {
                 if (counter.get(j) < nextLayer) {
                     nextLayer = counter.get(j);
                 }
             }
-//            System.out.println("Next layer: " + nextLayer);
-
 
             for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
                 int row = nextLayer;
                     grid[row][col - 1] = 1;
             }
-//            System.out.println("Array: " + Arrays.deepToString(getGrid()));
+            i++;
         }
-    }
+//    }
 
         public ArrayList<String> getFileData (String fileName){
             File f = new File(fileName);
