@@ -13,9 +13,17 @@ public class DrawPanel extends JPanel implements MouseListener {
 
     }
 
+    long originalTime = System.currentTimeMillis();
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        long time = System.currentTimeMillis();
+
+        if ((time - originalTime) > 500) {
+            layout.dropOneBrick();
+            originalTime = System.currentTimeMillis();
+        }
 
         int[][] grid = layout.getGrid();
         int x = 10;

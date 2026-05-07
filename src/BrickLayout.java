@@ -25,36 +25,54 @@ public class BrickLayout {
     public int[][] getGrid() {
         return grid;
     }
-    long startTime = System.currentTimeMillis();
+    long originalTime = System.currentTimeMillis();
 
     private int i = 0;
     public void dropOneBrick() {
-//        for (int i = 0; i < bricks.size(); i++) {
-            ArrayList<Integer> counter = new ArrayList<>();
-            for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
-                int count = 29;
-                for (int row = 29; row >= 0; row--) {
-                    if (grid[row][col - 1] == 1) {
-                        count = row - 1;
-                    }
-                }
-                counter.add(count);
-            }
-
-            int nextLayer = counter.get(0);
-            for (int j = 1; j < counter.size(); j++) {
-                if (counter.get(j) < nextLayer) {
-                    nextLayer = counter.get(j);
+        ArrayList<Integer> counter = new ArrayList<>();
+        for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
+            int count = 29;
+            for (int row = 29; row >= 0; row--) {
+                if (grid[row][col - 1] == 1) {
+                    count = row - 1;
                 }
             }
-
-            for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
-                int row = nextLayer;
-                    grid[row][col - 1] = 1;
-            }
-            i++;
+            counter.add(count);
         }
-//    }
+
+        int nextLayer = counter.get(0);
+        for (int j = 1; j < counter.size(); j++) {
+            if (counter.get(j) < nextLayer) {
+                nextLayer = counter.get(j);
+            }
+        }
+
+        //time
+        long time = System.currentTimeMillis();
+        int currentRow = 0;
+
+        if ((time - originalTime) > 500) {
+            for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
+                grid[currentRow][col - 1] = 0;
+                currentRow++;
+                System.out.println("Current row: " + currentRow);
+                if (currentRow == nextLayer) {
+                    currentRow = 0;
+                    System.out.println("Current Row: " + currentRow);
+                    i++;
+                }
+                grid[currentRow][col - 1] = 1;
+                System.out.println(Arrays.deepToString(grid));
+                originalTime = System.currentTimeMillis();
+            }
+        }
+
+//        for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
+//            int row = currentRow;
+//            grid[row][col - 1] = 1;
+//        }
+//        i++;
+    }
 
         public ArrayList<String> getFileData (String fileName){
             File f = new File(fileName);
