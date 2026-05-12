@@ -52,26 +52,29 @@ public class BrickLayout {
         int currentRow = 0;
 
         if ((time - originalTime) > 500) {
-            for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
-                grid[currentRow][col - 1] = 0;
-                currentRow++;
-                System.out.println("Current row: " + currentRow);
-                if (currentRow == nextLayer) {
-                    currentRow = 0;
-                    System.out.println("Current Row: " + currentRow);
-                    i++;
+            while (currentRow < nextLayer) {
+                if ((time - originalTime) > 500){
+                    currentRow++;
+                for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
+                    grid[currentRow - 1][col - 1] = 0;
                 }
-                grid[currentRow][col - 1] = 1;
-                System.out.println(Arrays.deepToString(grid));
-                originalTime = System.currentTimeMillis();
+                }
+                for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
+                    grid[currentRow][col - 1] = 1;
+                }
             }
-        }
+//            if (currentRow > nextLayer) {
+//                currentRow = 0;
+//            }
+            originalTime = System.currentTimeMillis();
+            i++;
 
-//        for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
-//            int row = currentRow;
-//            grid[row][col - 1] = 1;
-//        }
-//        i++;
+//            for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
+//                int row = nextLayer;
+//                grid[row][col - 1] = 1;
+//            }
+//            i++;
+        }
     }
 
         public ArrayList<String> getFileData (String fileName){
