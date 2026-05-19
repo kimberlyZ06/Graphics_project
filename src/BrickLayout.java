@@ -6,75 +6,136 @@ import java.util.Scanner;
 
 public class BrickLayout {
 
-    private ArrayList<Brick> bricks;
+    private final int l = 1;
+    private ArrayList<Brick> bricks = new ArrayList<Brick>();
+    private ArrayList<Brick> bricks2 = new ArrayList<Brick>();
     private int[][] grid;
+    private int col;
+    private int currRow;
+    private long time;
+    private int count = 0;
 
-    public BrickLayout(String inputFile) {
+    public BrickLayout(String inputFile, int col, boolean dropAll) {
+        this.col = col;
         ArrayList<String> fileData = getFileData(inputFile);
-        bricks = new ArrayList<Brick>();
         for (String line : fileData) {
             String[] points = line.split(",");
             int start = Integer.parseInt(points[0]);
             int end = Integer.parseInt(points[1]);
             Brick b = new Brick(start, end);
             bricks.add(b);
+            bricks2.add(b);
         }
         grid = new int[30][40];
+        currRow = grid.length - 1;
     }
 
     public int[][] getGrid() {
         return grid;
     }
+
     long originalTime = System.currentTimeMillis();
 
     private int i = 0;
+
     public void dropOneBrick() {
-        ArrayList<Integer> counter = new ArrayList<>();
-        for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
-            int count = 29;
-            for (int row = 29; row >= 0; row--) {
-                if (grid[row][col - 1] == 1) {
-                    count = row - 1;
+
+        if (!bricks.isEmpty()){
+            Brick b = bricks.removeFirst();
+            int start = b.getStart();
+            int end = b.getEnd();
+            boolean placed = false;
+
+            while (!placed){
+                if(!checkRow (currRow, start, end)){
+                    if (currRow > 1 && currRow < grid.length - 1){
+                        currRow++;
+                    }
+                    if (checkRow (currRow, start, end)){
+                        currRow--;
+                    }
+                } else {
+                    while (checkRow(currRow, start,end)){
+                        if (checkRow(currRow, start,end) && (currRow > 1)){
+                            currRow--;
+                        }
+                    }
                 }
+                for (int j = start; j <= end; j++) {
+                    grid[currRow][j] = 1;
+                }
+                placed = true;
             }
-            counter.add(count);
         }
+    }
 
-        int nextLayer = counter.get(0);
-        for (int j = 1; j < counter.size(); j++) {
-            if (counter.get(j) < nextLayer) {
-                nextLayer = counter.get(j);
+    public void placeOneBrick(){
+        int start;
+        int end;
+        if (!bricks2.isEmpty()){
+            Brick b = bricks2.removeFirst();
+            start = b.getStart();
+            end = b.getEnd();
+
+            for (int j = start; j <= end; j++) {
+                grid[b.getLayer()][i] = 1;
             }
         }
+    }
 
-        //time
-        long time = System.currentTimeMillis();
-        int currentRow = 0;
+    public void fallingBricks(){
+        placeOneBrick();
 
-        if ((time - originalTime) > 500) {
-            while (currentRow < nextLayer) {
-                if ((time - originalTime) > 500){
-                    currentRow++;
-                for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
-                    grid[currentRow - 1][col - 1] = 0;
+        // first round gets diff between the changing bricks
+        // second round gets bricks len
+        for (int j = 0; j < (bricks.size() - bricks2.size()); j++) {
+            int start = bricks.get(j).getStart();
+            int end = bricks.get(j).getEnd();
+            int height = bricks.get(j).getLayer();
+
+            if (height < 29 && !checkUnderBrick(height, start, end - start)) { // block moves down
+                for (int i = start; i <= end; i++) { // set prev block to zeroes
+                    grid[height][i] = 0;
                 }
+
+                bricks.get(j).setLayer(bricks.get(j).getLayer() + 1);
+
+                for (int i = start; i <= end; i++) { // new loc is filled with ones
+                    grid[bricks.get(j).getLayer()][i] = 1;
                 }
-                for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
-                    grid[currentRow][col - 1] = 1;
-                }
+            } else if (height == 29 || checkUnderBrick(height, start, end - start)){ // removes brick from list
+                bricks.remove(j);
+                j--;
             }
-//            if (currentRow > nextLayer) {
-//                currentRow = 0;
-//            }
-            originalTime = System.currentTimeMillis();
-            i++;
-
-//            for (int col = bricks.get(i).getStart(); col <= bricks.get(i).getEnd(); col++) {
-//                int row = nextLayer;
-//                grid[row][col - 1] = 1;
-//            }
-//            i++;
         }
+//        }
+    }
+
+    public boolean checkUnderBrick(int r, int c, int length){ // check for the length of the brick
+        for (int i = c; i < c + length; i++){
+            if (grid[r+1][i] == 1){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkRow(int row){
+        for (int c = 0; c < grid[0].length; c++){
+            if (grid[row][c] == 1){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkRow(int row, int start, int end){
+        for (int s = start; s <= end; s++){
+            if (grid[row][s] == 1){
+                return true;
+            }
+        }
+        return false;
     }
 
         public ArrayList<String> getFileData (String fileName){

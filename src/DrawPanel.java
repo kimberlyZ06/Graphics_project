@@ -5,11 +5,13 @@ import javax.swing.JPanel;
 
 public class DrawPanel extends JPanel implements MouseListener {
 
+    private boolean click;
+    private boolean once = true;
     BrickLayout layout;
 
     public DrawPanel() {
         this.addMouseListener(this);
-        layout = new BrickLayout("src/input_file");
+        layout = new BrickLayout("src/input_file", 40, true);
 
     }
 
@@ -21,8 +23,9 @@ public class DrawPanel extends JPanel implements MouseListener {
         long time = System.currentTimeMillis();
 
         if ((time - originalTime) > 500) {
-            layout.dropOneBrick();
+//            layout.dropOneBrick();
             originalTime = System.currentTimeMillis();
+            layout.fallingBricks();
         }
 
         int[][] grid = layout.getGrid();
@@ -45,11 +48,23 @@ public class DrawPanel extends JPanel implements MouseListener {
             x = 10;
             y += 24;
         }
+
+        if (click && once){
+            time = System.currentTimeMillis();
+            once = false;
+        }
+
+        if (click){
+            if (System.currentTimeMillis() - time == 5){
+                layout.fallingBricks();
+            }
+        }
+
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        layout.dropOneBrick();
+        click = true;
     }
 
     @Override
